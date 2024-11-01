@@ -1,8 +1,28 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
+from fastapi_pagination import add_pagination
 
-### Create FastAPI instance with custom docs and openapi url
-app = FastAPI(docs_url="/api/py/docs", openapi_url="/api/py/openapi.json")
+from api.conf import config
+from api.conf.config import db_engine
+from api.routes import file, base, task
 
-@app.get("/api/py/helloFastApi")
-def hello_fast_api():
-    return {"message": "Hello from FastAPI"}
+API_END_POINTS = '/api'
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print('on_startup')
+    config.init_db()
+    print('db engine created')
+    try:
+        yield
+    finally:
+        print('on_shutdown')
+        db_engine.dispose()
+
+app = FastAPI(docs_url="/api/py/docs", openapi_url="/api/py/openapi.json", lifespan=lifespan)
+add_pagination(app)
+
+app.include_router(base.router, prefix='')
+app.include_router(file.router, prefix=API_END_POINTS)
+app.include_router(task.router, prefix=API_END_POINTS)

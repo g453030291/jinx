@@ -4,7 +4,7 @@ router = APIRouter()
 
 @router.get("/api/py/helloFastApi")
 def hello_fast_api():
-    return {"message": "Hello from FastAPI"}
+    return {"message": "Hello from FastAPI1102"}
 
 @router.get("/")
 def read_root():

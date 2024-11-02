@@ -24,5 +24,7 @@ app = FastAPI(docs_url="/api/py/docs", openapi_url="/api/py/openapi.json", lifes
 add_pagination(app)
 
 app.include_router(base.router, prefix='')
+
 app.include_router(file.router, prefix=API_END_POINTS)
+
 app.include_router(task.router, prefix=API_END_POINTS)

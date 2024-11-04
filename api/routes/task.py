@@ -11,6 +11,16 @@ from api.model.task import Task, TaskQuery
 
 router = APIRouter()
 
+@router.post("/task/create", response_model=Task)
+def create_task(task: Task, db: Session = Depends(get_db)) -> Any:
+    try:
+        db.add(task)
+        db.commit()
+        db.refresh(task)
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    return task
 
 @router.post("/task/list", response_model=Page[Task])
 def list_tasks(taskQuery: TaskQuery = Body(...), db: Session = Depends(get_db)) -> Any:
@@ -29,3 +39,19 @@ def list_tasks(taskQuery: TaskQuery = Body(...), db: Session = Depends(get_db)) 
     query = select(Task).where(*filters) if filters else select(Task)
     page_params = Params(page=taskQuery.page, size=taskQuery.size)
     return paginate(db, query, params=page_params)
+
+@router.post("/task/delete", response_model=Task)
+def delete_task(task: Task, db: Session = Depends(get_db)) -> Any:
+    try:
+        statement = select(Task).where(Task.id == task.id)
+        result = db.execute(statement).scalars().first()
+        if not result:
+            raise HTTPException(status_code=404, detail="Task not found")
+        result.deleted = True
+        db.add(result)
+        db.commit()
+        db.refresh(result)
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    return result

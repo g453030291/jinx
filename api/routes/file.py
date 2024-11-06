@@ -13,6 +13,5 @@ async def upload(files: list[UploadFile] = File(...)):
     for file in files:
         contents = await file.read()
         filename = file.filename
-        oss_client.put_object(filename, contents)
-        urls.append(oss_client.get_object_url(filename))
+        urls.append(oss_client.put_object(filename, contents))
     return Resp.success(data={"urls": urls})

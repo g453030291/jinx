@@ -13,6 +13,8 @@ class OSSClient:
         date_prefix = datetime.now().strftime("%Y/%m/%d")
         full_key = f"{date_prefix}/{key}"
         self.bucket.put_object(full_key, data)
+        url_prefix = constant.oss_endpoint.replace('https://', f'https://{constant.oss_bucket_name}.')
+        return f'{url_prefix}/{full_key}'
 
     def get_object(self, key):
         return self.bucket.get_object(key).read()

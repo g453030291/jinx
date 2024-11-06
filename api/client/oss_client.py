@@ -24,7 +24,7 @@ class OSSClient:
         return [obj.key for obj in oss2.ObjectIterator(self.bucket)]
 
     def get_object_url(self, key):
-        return self.bucket.sign_url('GET', key, 60)
+        return self.bucket.sign_url('GET', key, 0)
 
     def put_object_from_file(self, key, file_path):
         self.bucket.put_object_from_file(key, file_path)

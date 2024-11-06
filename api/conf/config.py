@@ -1,4 +1,5 @@
-from typing import Iterator, Generator, Annotated
+import os
+from typing import Generator, Annotated
 
 from fastapi import Depends
 from pydantic.v1 import BaseSettings
@@ -6,6 +7,8 @@ from sqlalchemy import create_engine
 from sqlmodel import Session
 
 from api.conf import root_path
+
+IS_PROD = os.getenv('ENV') == 'prod'
 
 # 读取常量配置
 class Constant(BaseSettings):
@@ -20,9 +23,11 @@ class Constant(BaseSettings):
     db_name: str = "db_name"
 
     class Config:
-        env_file = None
-        # env_file = f"{root_path}/.env"
-        # env_file_encoding = "utf-8"
+        if IS_PROD:
+            env_file = None
+        else:
+            env_file = f"{root_path}/.env"
+            env_file_encoding = "utf-8"
         # case_sensitive = True
         # env_prefix = "FASTAPI_"
 

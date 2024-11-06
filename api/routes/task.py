@@ -7,14 +7,13 @@ from sqlalchemy.future import select
 
 from api.client.aliyun_client import AliyunClient
 from api.conf.config import SessionDep
-from api.model import resp
 from api.model.resp import Resp
 from api.model.task import Task, TaskQuery
 from api.service import task_service
 
 router = APIRouter()
 
-@router.post("/task/create", response_model=Task)
+@router.post("/task/create", response_model=Resp)
 def create_task(session: SessionDep, task: Task) -> Any:
     try:
         aliyun_client = AliyunClient()
@@ -53,7 +52,7 @@ def list_tasks(session: SessionDep, taskQuery: TaskQuery = Body(...)) -> Any:
     page_result = paginate(session, query, params=page_params)
     return Resp.success(data=page_result)
 
-@router.post("/task/delete", response_model=Task)
+@router.post("/task/delete", response_model=Resp)
 def delete_task(session: SessionDep, id: int = Body(..., embed=True)) -> Any:
     try:
         statement = select(Task).where(Task.id == id)

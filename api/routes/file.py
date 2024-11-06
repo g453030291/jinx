@@ -6,7 +6,7 @@ from api.model.resp import Resp
 
 router = APIRouter()
 
-@router.post("/upload")
+@router.post("/file/upload")
 async def upload(files: list[UploadFile] = File(...)):
     urls = []
     oss_client = OSSClient()

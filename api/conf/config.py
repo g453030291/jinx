@@ -1,5 +1,6 @@
-from typing import Iterator
+from typing import Iterator, Generator, Annotated
 
+from fastapi import Depends
 from pydantic.v1 import BaseSettings
 from sqlalchemy import create_engine
 from sqlmodel import Session
@@ -30,11 +31,10 @@ def init_db():
     return create_engine(
         f"postgresql://{constant.db_user}:{constant.db_password}@{constant.db_host}:{constant.db_port}/{constant.db_name}?sslmode=require")
 
-def get_db() -> Iterator[Session]:
-    with Session(db_engine) as db, db.begin():
-        yield db
+def get_db() -> Generator[Session, None, None]:
+    with Session(init_db()) as session:
+        yield session
 
-db_engine = init_db()
 
-if __name__ == '__main__':
-    print(constant.db_port)
+SessionDep = Annotated[Session, Depends(get_db)]
+

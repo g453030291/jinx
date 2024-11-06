@@ -4,7 +4,6 @@ from fastapi import FastAPI
 from fastapi_pagination import add_pagination
 
 from api.conf import config
-from api.conf.config import db_engine
 from api.routes import file, base, task
 
 API_END_POINTS = '/api'
@@ -18,7 +17,7 @@ async def lifespan(app: FastAPI):
         yield
     finally:
         print('on_shutdown')
-        db_engine.dispose()
+        config.init_db().dispose()
 
 app = FastAPI(docs_url="/api/py/docs", openapi_url="/api/py/openapi.json", lifespan=lifespan)
 add_pagination(app)

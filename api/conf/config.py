@@ -20,8 +20,9 @@ class Constant(BaseSettings):
     db_name: str = "db_name"
 
     class Config:
-        env_file = f"{root_path}/.env"
-        env_file_encoding = "utf-8"
+        env_file = None
+        # env_file = f"{root_path}/.env"
+        # env_file_encoding = "utf-8"
         # case_sensitive = True
         # env_prefix = "FASTAPI_"
 

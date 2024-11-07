@@ -11,7 +11,7 @@ class Task(SQLModel, table=True):
     __table_args__ = {"schema": "j_base"}
 
     id: Optional[int] = Field(default=None, primary_key=True, description="任务ID")
-    task_type: int = Field(default=0, description="任务类型:1=图片翻译")
+    task_type: int = Field(default=0, description="任务类型:1=图片翻译,2=背景生成")
     task_status: int = Field(default=0, description="任务状态:0=初始化,1=执行中, 2=成功,3=失败")
     fail_msg: str = Field(default="", max_length=256, description="任务失败原因")
     task_name: str = Field(default="", max_length=56, description="任务名称")
@@ -38,6 +38,14 @@ class TaskQuery(Pagination):
     task_status: int = Field(default=0, description="任务状态:0=初始化,1=执行中, 2=成功,3=失败")
     task_name: str = Field(default="", description="任务名称")
     create_id: int = Field(default=0, description="创建者ID")
+
+class TaskParams(Task):
+    ref_image_url: Optional[str] = Field(default=None, max_length=512, description="参考图片URL", exclude=True)
+    ref_prompt: Optional[str] = Field(default=None, max_length=256, description="参考提示", exclude=True)
+    foreground_edges: Optional[str] = Field(default=None, max_length=512, description="前景边缘", exclude=True)
+    background_edges: Optional[str] = Field(default=None, max_length=512, description="背景边缘", exclude=True)
+    foreground_edge_prompts: Optional[str] = Field(default=None, max_length=512, description="前景边缘提示", exclude=True)
+    background_edge_prompts: Optional[str] = Field(default=None, max_length=512, description="背景边缘提示", exclude=True)
 
 
 

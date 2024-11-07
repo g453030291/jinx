@@ -16,6 +16,7 @@ class Constant(BaseSettings):
     oss_endpoint: str = "oss_endpoint"
     access_key_id: str = "oss_access_key_id"
     access_key_secret: str = "oss"
+    ali_bai_lian_api_key: str = "ali_bai_lian_api_key"
     db_host: str = "db_host"
     db_port: str = "db_port"
     db_user: str = "db_user"

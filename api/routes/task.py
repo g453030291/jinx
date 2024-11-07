@@ -1,36 +1,24 @@
 from typing import Any
 
 from fastapi import APIRouter, HTTPException, Body
-from fastapi_pagination import Page, Params
+from fastapi_pagination import Params
 from fastapi_pagination.ext.sqlalchemy import paginate
 from sqlalchemy.future import select
 
-from api.client.aliyun_client import AliyunClient
 from api.conf.config import SessionDep
 from api.model.resp import Resp
-from api.model.task import Task, TaskQuery
+from api.model.task import Task, TaskQuery, TaskParams
 from api.service import task_service
 
 router = APIRouter()
 
 @router.post("/task/create", response_model=Resp)
-def create_task(session: SessionDep, task: Task) -> Any:
+def create_task(session: SessionDep, task: TaskParams) -> Any:
     try:
-        aliyun_client = AliyunClient()
-        is_success, finish_url = task_service.translate_image(aliyun_client, task.origin_url, task.source_language, task.target_language)
-        if not is_success:
-            task.task_status = 3
-            task.fail_msg = "图片翻译失败"
-        else:
-            task.task_status = 2
-            task.finish_url = finish_url
-        session.add(task)
-        session.commit()
-        session.refresh(task)
+        task_service.add_task(session, task)
     except Exception as e:
-        session.rollback()
         raise HTTPException(status_code=500, detail=str(e))
-    return Resp.success(task)
+    return Resp.success('task is processing')
 
 @router.post("/task/list", response_model=Resp)
 def list_tasks(session: SessionDep, taskQuery: TaskQuery = Body(...)) -> Any:

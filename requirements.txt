@@ -9,3 +9,5 @@ sqlmodel==0.0.22
 psycopg2-binary==2.9.10
 fastapi-pagination==0.12.31
 pydantic==2.9.2
+#openai==1.54.3
+#dashscope==1.20.12

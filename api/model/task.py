@@ -1,5 +1,7 @@
+from pydantic import BaseModel
+from sqlalchemy import false, Column, JSON
 from sqlmodel import SQLModel, Field, create_engine, Session, select
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 
 from api.conf.config import constant
@@ -15,11 +17,9 @@ class Task(SQLModel, table=True):
     task_status: int = Field(default=0, description="任务状态:0=初始化,1=执行中, 2=成功,3=失败")
     fail_msg: str = Field(default="", max_length=256, description="任务失败原因")
     task_name: str = Field(default="", max_length=56, description="任务名称")
-    origin_url: str = Field(default="", max_length=512, description="原始URL")
-    source_language: str = Field(default="", max_length=56, description="源语言")
-    target_language: str = Field(default="", max_length=56, description="目标语言")
-    finish_url: str = Field(default="", max_length=512, description="完成URL")
+    finish_url: Optional[dict] = Field(default=None, sa_column=Column(JSON), description="完成URL")
     finish_time: datetime = Field(default=datetime(1970, 1, 1, 8, 0, 0), description="完成时间")
+    task_content: Optional[dict] = Field(default=None, sa_column=Column(JSON), description="任务内容")
     create_id: int = Field(default=0, description="创建者ID")
     create_name: Optional[str] = Field(default="", max_length=56, description="创建者名称")
     create_at: datetime = Field(default_factory=datetime.utcnow, description="创建时间")
@@ -39,13 +39,33 @@ class TaskQuery(Pagination):
     task_name: str = Field(default="", description="任务名称")
     create_id: int = Field(default=0, description="创建者ID")
 
-class TaskParams(Task):
-    ref_image_url: Optional[str] = Field(default=None, max_length=512, description="参考图片URL", exclude=True)
-    ref_prompt: Optional[str] = Field(default=None, max_length=256, description="参考提示", exclude=True)
-    foreground_edges: Optional[str] = Field(default=None, max_length=512, description="前景边缘", exclude=True)
-    background_edges: Optional[str] = Field(default=None, max_length=512, description="背景边缘", exclude=True)
-    foreground_edge_prompts: Optional[str] = Field(default=None, max_length=512, description="前景边缘提示", exclude=True)
-    background_edge_prompts: Optional[str] = Field(default=None, max_length=512, description="背景边缘提示", exclude=True)
+
+class ImageTranslateParams(BaseModel):
+    origin_url: str = Field(default="", max_length=512, description="原始URL")
+    source_language: str = Field(default="", max_length=56, description="源语言")
+    target_language: str = Field(default="", max_length=56, description="目标语言")
+
+class BackgroundGenerationParams(BaseModel):
+    origin_url: str = Field(default="", max_length=512, description="基础图片URL")
+    ref_image_url: Optional[str] = Field(default=None, max_length=512, description="参考图片URL")
+    ref_prompt: Optional[str] = Field(default=None, max_length=256, description="参考提示")
+    foreground_edges: Optional[List[str]] = Field(default=None, description="前景边缘")
+    background_edges: Optional[List[str]] = Field(default=None, description="背景边缘")
+    foreground_edge_prompts: Optional[List[str]] = Field(default=None, description="前景边缘提示")
+    background_edge_prompts: Optional[List[str]] = Field(default=None, description="背景边缘提示")
+    n: Optional[int] = Field(default=None, description="数量")
+    ref_prompt_weight: Optional[float] = Field(default=None, description="参考提示权重")
+    model_version: Optional[str] = Field(default=None, max_length=56, description="模型版本")
+
+    class Config:
+        protected_namespaces = ()
+
+class TaskParams(BaseModel):
+    task_type: int = Field(default=0, description="任务类型:1=图片翻译,2=背景生成")
+    task_name: str = Field(default="", max_length=56, description="任务名称")
+    image_translate_params: Optional[ImageTranslateParams] = Field(default=None, description="图片翻译参数")
+    background_generation_params: Optional[BackgroundGenerationParams] = Field(default=None, description="背景生成参数")
+
 
 
 

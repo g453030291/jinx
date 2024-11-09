@@ -1,10 +1,11 @@
 import os
-from typing import Generator, Annotated
+import ssl
+from typing import Annotated, AsyncGenerator
 
 from fastapi import Depends
 from pydantic.v1 import BaseSettings
-from sqlalchemy import create_engine
-from sqlmodel import Session
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import sessionmaker
 
 from api.conf import root_path
 
@@ -34,14 +35,31 @@ class Constant(BaseSettings):
 
 constant = Constant()
 
-def init_db():
-    return create_engine(
-        f"postgresql://{constant.db_user}:{constant.db_password}@{constant.db_host}:{constant.db_port}/{constant.db_name}?sslmode=require")
 
-def get_db() -> Generator[Session, None, None]:
-    with Session(init_db()) as session:
+# 创建 SSL 上下文
+# ssl_context = ssl.create_default_context()
+
+# 如果不需要验证 SSL 证书（不推荐在生产环境使用）
+# ssl_context.check_hostname = False
+# ssl_context.verify_mode = ssl.CERT_NONE
+
+# 创建异步引擎
+engine = create_async_engine(
+    f"postgresql+asyncpg://{constant.db_user}:{constant.db_password}@{constant.db_host}:{constant.db_port}/{constant.db_name}",
+    # connect_args={"ssl": ssl_context}
+)
+
+# 创建异步会话工厂
+async_session_maker = sessionmaker(
+    bind=engine,
+    class_=AsyncSession,
+    expire_on_commit=False
+)
+
+# 定义 get_db 函数，用于依赖注入
+async def get_db():
+    async with async_session_maker() as session:
         yield session
 
-
-SessionDep = Annotated[Session, Depends(get_db)]
+SessionDep = Annotated[AsyncSession, Depends(get_db)]
 

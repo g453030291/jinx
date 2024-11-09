@@ -1,15 +1,26 @@
+import asyncio
+
 from api.conf.config import constant
 
-import requests
-import json
+import httpx
 
 # aliyun 百炼大模型
 
 # 生成背景
 # base_image_url必传,
 # ref_image_url, ref_prompt必传一个
-def generate_background(base_image_url, ref_image_url, ref_prompt, foreground_edges=None, background_edges=None,
-                    foreground_edge_prompts=None, background_edge_prompts=None):
+async def generate_background(
+    base_image_url,
+    ref_image_url=None,
+    ref_prompt=None,
+    foreground_edges=None,
+    background_edges=None,
+    foreground_edge_prompt=None,
+    background_edge_prompt=None,
+    n=None,
+    ref_prompt_weight=None,
+    model_version=None
+):
     url = 'https://dashscope.aliyuncs.com/api/v1/services/aigc/background-generation/generation/'
     headers = {
         'X-DashScope-Async': 'enable',
@@ -17,12 +28,14 @@ def generate_background(base_image_url, ref_image_url, ref_prompt, foreground_ed
         'Content-Type': 'application/json'
     }
     data = {
-        "model": 'wanx-background-generation-v2',
+        "model": "wanx-background-generation-v2",
         "input": {
             "base_image_url": base_image_url,
             "reference_edge": {}
         }
     }
+
+    # 添加可选的 input 参数
     if ref_image_url is not None:
         data["input"]["ref_image_url"] = ref_image_url
     if ref_prompt is not None:
@@ -31,23 +44,38 @@ def generate_background(base_image_url, ref_image_url, ref_prompt, foreground_ed
         data["input"]["reference_edge"]["foreground_edge"] = foreground_edges
     if background_edges is not None:
         data["input"]["reference_edge"]["background_edge"] = background_edges
-    if foreground_edge_prompts is not None:
-        data["input"]["reference_edge"]["foreground_edge_prompt"] = foreground_edge_prompts
-    if background_edge_prompts is not None:
-        data["input"]["reference_edge"]["background_edge_prompt"] = background_edge_prompts
+    if foreground_edge_prompt is not None:
+        data["input"]["reference_edge"]["foreground_edge_prompt"] = foreground_edge_prompt
+    if background_edge_prompt is not None:
+        data["input"]["reference_edge"]["background_edge_prompt"] = background_edge_prompt
 
-    response = requests.post(url, headers=headers, data=json.dumps(data))
-    return response.json()
+    # 构建可选的 parameters 参数
+    parameters = {}
+    if n is not None:
+        parameters["n"] = n
+    if ref_prompt_weight is not None:
+        parameters["ref_prompt_weight"] = ref_prompt_weight
+    if model_version is not None:
+        parameters["model_version"] = model_version
+    if parameters:
+        data["parameters"] = parameters
+
+    async with httpx.AsyncClient() as client:
+        response = await client.post(url, headers=headers, json=data)
+        response.raise_for_status()
+        return response.json()
 
 # 查询任务结果
 # GET https://dashscope.aliyuncs.com/api/v1/tasks/{task_id}
-def get_task_result(task_id):
+async def get_task_result(task_id):
     url = f'https://dashscope.aliyuncs.com/api/v1/tasks/{task_id}'
     headers = {
         'Authorization': f'Bearer {constant.ali_bai_lian_api_key}'
     }
-    response = requests.get(url, headers=headers)
-    return response.json()
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url, headers=headers)
+        response.raise_for_status()  # 检查请求是否成功
+        return response.json()
 
 # Example usage:
 base_image_url = 'https://vision-poster.oss-cn-shanghai.aliyuncs.com/lllcho.lc/data/test_data/images/main_images/new_main_img/a.png'
@@ -63,9 +91,14 @@ background_edges = [
 foreground_edge_prompts = None
 background_edge_prompts = None
 
-if __name__ == '__main__':
-    # response = generate_background(base_image_url=base_image_url, ref_image_url=ref_image_url, ref_prompt=None)
+async def main_test():
+    # response = await generate_background(base_image_url=base_image_url, ref_image_url=ref_image_url, ref_prompt=None)
     # print(response)
-    # task_id = response['output']['task_id']
-    result = get_task_result('99c7a783-19f7-4816-8b4a-4434df34286c')
+    result = await get_task_result('72dc6194-ad6d-4e09-88b7-6fbca538ba86')
     print(result)
+
+if __name__ == '__main__':
+    asyncio.run(main_test())
+    # task_id = response['output']['task_id']
+    # result = get_task_result('99c7a783-19f7-4816-8b4a-4434df34286c')
+    # print(result)

@@ -12,11 +12,10 @@ from api.model.resp import Resp
 
 router = APIRouter()
 
-hed_processor = Processor('softedge_hed')
-
 # 生成一个图片处理的方法
 @router.post("/foreground/generate", response_model=Resp)
 def foreground_edges_generate(o_url: str = Body(..., embed=True)):
+    hed_processor = Processor('softedge_hed')
     if o_url.startswith("https://tristana-oss.oss-cn-shanghai.aliyuncs.com"):
         oss_client = OSSClient()
         img_data = oss_client.get_object(urlparse(o_url).path[1:])

@@ -1,13 +1,13 @@
-import uuid
-from urllib.parse import urlparse
-
-from controlnet_aux.processor import Processor
+# import uuid
+# from urllib.parse import urlparse
+#
+# from controlnet_aux.processor import Processor
 from fastapi import APIRouter, Body
 
-from PIL import Image
-import requests
-from io import BytesIO
-from api.client.oss_client import OSSClient
+# from PIL import Image
+# import requests
+# from io import BytesIO
+# from api.client.oss_client import OSSClient
 from api.model.resp import Resp
 
 router = APIRouter()

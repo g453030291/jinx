@@ -1,19 +1,19 @@
 # import whisperx
-from PIL import Image
-from controlnet_aux.processor import Processor
-#
-def make_elements(name):
-    hed_processor = Processor('softedge_hed')
-    img = Image.open(name)
-    if img.mode == 'RGBA':
-        r, g, b, a = img.split()
-        img = img.convert('RGB')
-        hed_img = hed_processor(img, to_pil=True).resize(img.size).convert('RGB')
-        hed_img.putalpha(a)
-    else:
-        img = img.convert('RGB')
-        hed_img = hed_processor(img, to_pil=True).resize(img.size).convert('RGB')
-    hed_img.save('/Users/gemushen/test-file/make_elements/result1.png')
+# from PIL import Image
+# from controlnet_aux.processor import Processor
+# #
+# def make_elements(name):
+#     hed_processor = Processor('softedge_hed')
+#     img = Image.open(name)
+#     if img.mode == 'RGBA':
+#         r, g, b, a = img.split()
+#         img = img.convert('RGB')
+#         hed_img = hed_processor(img, to_pil=True).resize(img.size).convert('RGB')
+#         hed_img.putalpha(a)
+#     else:
+#         img = img.convert('RGB')
+#         hed_img = hed_processor(img, to_pil=True).resize(img.size).convert('RGB')
+#     hed_img.save('/Users/gemushen/test-file/make_elements/result1.png')
 #
 # device = "cpu"
 # audio_file = "/Users/gemushen/test-file/Blank Space-2.mp3"

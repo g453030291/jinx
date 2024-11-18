@@ -16,7 +16,10 @@ async def task_processing(session: AsyncSession, task_params: TaskParams):
     if task.task_type == 1:
         task.task_content = task_params.image_translate_params.model_dump()
         aliyun_client = AliyunClient()
-        is_success, finish_url =  translate_image(aliyun_client, task_params.image_translate_params.origin_url, task_params.image_translate_params.source_language, task_params.image_translate_params.target_language)
+        is_success, finish_url =  translate_image(aliyun_client, task_params.image_translate_params.origin_url,
+                                                  task_params.image_translate_params.source_language,
+                                                  task_params.image_translate_params.target_language,
+                                                  task_params.image_translate_params.ignore_entity_recognize)
         task.finish_url = [finish_url]
         if not is_success:
             task.fail_msg = "图片翻译失败"
@@ -46,8 +49,8 @@ async def task_processing(session: AsyncSession, task_params: TaskParams):
     await session.commit()
 
 # 图片翻译任务
-def translate_image(aliyun_client, url, source_language, target_language):
-    result = aliyun_client.translate_image(url, source_language, target_language)
+def translate_image(aliyun_client, url, source_language, target_language, ignore_entity_recognize):
+    result = aliyun_client.translate_image(url, source_language, target_language, ignore_entity_recognize)
     if result.status_code != 200:
         return False, result.data.message
     return True, result.body.data.final_image_url

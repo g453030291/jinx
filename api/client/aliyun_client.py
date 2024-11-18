@@ -1,3 +1,4 @@
+import json
 
 from api.conf.config import constant
 
@@ -18,11 +19,12 @@ class AliyunClient:
         self.alimt_client = alimt20181012Client(config)
 
     # 图片翻译
-    def translate_image(self, target_url, source_language, target_language) -> alimt_20181012_models.TranslateImageResponse:
+    def translate_image(self, target_url, source_language, target_language, ignore_entity_recognize) -> alimt_20181012_models.TranslateImageResponse:
         translate_image_request = alimt_20181012_models.TranslateImageRequest()
         translate_image_request.image_url = target_url
         translate_image_request.source_language = source_language
         translate_image_request.target_language = target_language
+        translate_image_request.ext = json.dumps({"ignoreEntityRecognize": ignore_entity_recognize})
         return self.alimt_client.translate_image_with_options(translate_image_request, util_models.RuntimeOptions())
 
 if __name__ == '__main__':

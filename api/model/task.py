@@ -44,6 +44,7 @@ class ImageTranslateParams(BaseModel):
     origin_url: str = Field(default="", max_length=512, description="原始URL")
     source_language: str = Field(default="", max_length=56, description="源语言")
     target_language: str = Field(default="", max_length=56, description="目标语言")
+    ignore_entity_recognize: Optional[bool] = Field(default=False, description="是否忽略实体识别")
 
 class BackgroundGenerationParams(BaseModel):
     origin_url: str = Field(default="", max_length=512, description="基础图片URL")

@@ -7,8 +7,11 @@ WORKDIR /app
 # Copy the requirements file into the container
 COPY requirements.txt .
 
-# Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt && apt-get update && apt-get install -y curl
+# Install opencv dependencies and any needed packages specified in requirements.txt
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends libgl1-mesa-glx curl && \
+    pip install --no-cache-dir -r requirements.txt && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Copy the rest of the application code into the container
 COPY ./api ./api

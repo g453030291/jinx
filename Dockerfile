@@ -9,7 +9,7 @@ COPY requirements.txt .
 
 # Install opencv dependencies and any needed packages specified in requirements.txt
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends libgl1-mesa-glx libglib2.0-0 && \
+    apt-get install -y --no-install-recommends libgl1-mesa-glx libglib2.0-0 curl iputils-ping && \
     pip install --no-cache-dir -r requirements.txt && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 

@@ -14,10 +14,10 @@ RUN apt-get update && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Create the directory structure for the model file
-RUN mkdir -p ~/.cache/huggingface/hub/models--lllyasviel--Annotators/snapshots/982e7edaec38759d914a963c48c4726685de7d96
+RUN mkdir -p ~/.cache/huggingface/hub/models--lllyasviel--Annotators/blobs
 
 # Download the model file and place it in the specified directory
-RUN curl -L -o ~/.cache/huggingface/hub/models--lllyasviel--Annotators/snapshots/982e7edaec38759d914a963c48c4726685de7d96/ControlNetHED.pth \
+RUN curl -L -o ~/.cache/huggingface/hub/models--lllyasviel--Annotators/blobs/ControlNetHED.pth \
     http://tristana-oss.oss-cn-shanghai.aliyuncs.com/models/ControlNetHED.pth
 
 # Copy the rest of the application code into the container

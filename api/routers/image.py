@@ -44,19 +44,11 @@ def foreground_edges_generate(o_url: str = Body(..., embed=True)):
 # 生成虚拟人脸图
 @router.get("/fictional/face", response_model=Resp)
 def fictional_face():
-    # 获取虚拟人物的图片
+    oss_client = OSSClient()
     response = requests.get("https://thispersondoesnotexist.com")
     response.raise_for_status()
     picture = response.content
-
-    # 生成文件名并保存图片
     file_name = uuid.uuid4().hex + ".jpeg"
-    with open(file_name, "wb") as f:
-        f.write(picture)
-
-    # 上传图片到 OSS 并获取 URL
-    oss_client = OSSClient()
-    with open(file_name, "rb") as f:
-        oss_url = oss_client.put_object(file_name, f.read())
-
+    output = BytesIO(picture)
+    oss_url = oss_client.put_object(file_name, output.read())
     return Resp.success(data=oss_url)

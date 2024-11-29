@@ -60,13 +60,14 @@
 #     whisperx_test()
 import json
 
+import yagmail
 import yt_dlp
 
 from api.conf import root_path
 
 
 def youtube():
-    URLS = ['https://www.youtube.com/watch?v=ABCfUIKnvL8']
+    URLS = ['https://www.bilibili.com/video/BV1UBUHYTEqS/?spm_id_from=333.1007.tianma.2-1-4.click&vd_source=3db5c9c9957e313b7098ea2b30d5b0c3']
 
     def longer_than_a_minute(info, *, incomplete):
         """Download only videos longer than a minute (or with unknown duration)"""
@@ -76,12 +77,54 @@ def youtube():
 
     ydl_opts = {
         'match_filter': longer_than_a_minute,
+        'format': 'bestvideo+bestaudio/best',
+        'cookiefile': 'www.bilibili.com_cookies.txt',
     }
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         error_code = ydl.download(URLS)
 
+def send_email():
+    yag = yagmail.SMTP('80a951001@smtp-brevo.com', 'WMxmy3dNTHS6XhYq', host='smtp-relay.brevo.com', port=587)
+    to = '453030291@qq.com'
+    subject = '验证码'
+    body = '这是一个登录验证码:ABCD'
+    # html = '<a href="https://pypi.python.org/pypi/sky/">Click me!</a>'
+    # img = '/local/file/bunny.png'
+    yag.send(to=to, subject=subject, contents=[body])
+
+
+YOUR_API_KEY = ""
+
+from __future__ import print_function
+import time
+import brevo_python
+from brevo_python.rest import ApiException
+from pprint import pprint
+
+def send_brevo_email():
+    # Configure API key authorization: api-key
+    configuration = brevo_python.Configuration()
+    configuration.api_key['api-key'] = YOUR_API_KEY
+    # Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+    # configuration.api_key_prefix['api-key'] = 'Bearer'
+    # Configure API key authorization: partner-key
+    configuration = brevo_python.Configuration()
+    configuration.api_key['partner-key'] = YOUR_API_KEY
+    # Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+    # configuration.api_key_prefix['partner-key'] = 'Bearer'
+
+    # create an instance of the API class
+    api_instance = brevo_python.EmailCampaignsApi(brevo_python.ApiClient(configuration))
+    campaign_id = 789 # int | Id of the campaign
+    email_to = brevo_python.SendTestEmail() # SendTestEmail |
+
+    try:
+        # Send an email campaign to your test list
+        api_instance.send_test_email(campaign_id, email_to)
+    except ApiException as e:
+        print("Exception when calling EmailCampaignsApi->send_test_email: %s\n" % e)
 
 if __name__ == '__main__':
     # youtube()
-    print(root_path)
+    send_email()

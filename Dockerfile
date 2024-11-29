@@ -19,5 +19,5 @@ COPY ./api ./api
 # Expose the port the app runs on
 EXPOSE 80
 
-# Start the FastAPI application
+# Start the FastAPI application80
 CMD ["python3", "-m", "uvicorn", "api.index:app", "--host", "0.0.0.0", "--port", "80"]

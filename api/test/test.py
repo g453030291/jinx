@@ -60,8 +60,11 @@
 #     whisperx_test()
 import json
 
+import certifi
+import redis
 import yagmail
 import yt_dlp
+import jwt
 
 from api.conf import root_path
 
@@ -108,7 +111,7 @@ def buevo_send_email():
 
     # 创建发送邮件的内容
     send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
-        to=[{'email': '453030291@qq.com', 'name': 'gms'}],
+        to=[{'email': '453030q.com', 'name': 'gms'}],
         sender={'email': 'support@jinx-aa.xyz', 'name': 'jinx-support'},
         subject='邮件主题',
         html_content='<html><body><p>注册验证码:ABCD</p></body></html>'
@@ -121,7 +124,14 @@ def buevo_send_email():
     except ApiException as e:
         print("发送邮件时发生异常: %s\n" % e)
 
+def jwt_test():
+    encoded = jwt.encode({'some': 'payload'}, 'jinxtestp', algorithm='HS256')
+    print(encoded)
+    decoded = jwt.decode(encoded, 'jinxtestp', algorithms=['HS256'])
+    print(decoded)
+
 if __name__ == '__main__':
     # youtube()
     # send_email()
-    buevo_send_email()
+    # buevo_send_email()
+    jwt_test()

@@ -1,3 +1,4 @@
+from pydantic import BaseModel
 from sqlmodel import SQLModel, Field
 from datetime import datetime
 from typing import Optional
@@ -22,13 +23,11 @@ class User(SQLModel, table=True):
     class Config:
         from_attributes = True
 
-class UserQuery(SQLModel):
+class UserQuery(BaseModel):
     id: Optional[int] = None
     email: Optional[str] = None
     page: int = 1
     size: int = 10
     status: Optional[int] = None
+    verification_code: Optional[str] = None
 
-    class Config:
-        orm_mode = True
-        schema = User

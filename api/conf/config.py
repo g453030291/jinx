@@ -2,6 +2,8 @@ import os
 import ssl
 from typing import Annotated, AsyncGenerator
 
+import certifi
+import redis
 from fastapi import Depends
 from pydantic.v1 import BaseSettings
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
@@ -24,6 +26,9 @@ class Constant(BaseSettings):
     db_password: str = "db_password"
     db_name: str = "db_name"
     brevo_api_key: str = "brevo_api_key"
+    redis_host: str = "redis_host"
+    redis_port: str = "redis_port"
+    redis_password: str = "redis_password"
 
     class Config:
         if IS_PROD:
@@ -64,3 +69,10 @@ async def get_db():
 
 SessionDep = Annotated[AsyncSession, Depends(get_db)]
 
+# redis
+redis = redis.Redis(host=constant.redis_host,
+                port=constant.redis_port,
+                password=constant.redis_password,
+                ssl=True,
+                decode_responses=True,
+                ssl_ca_certs=certifi.where())

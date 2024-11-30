@@ -94,37 +94,34 @@ def send_email():
     yag.send(to=to, subject=subject, contents=[body])
 
 
-YOUR_API_KEY = ""
+YOUR_API_V3_KEY = ""
+import sib_api_v3_sdk
+from sib_api_v3_sdk.rest import ApiException
 
-from __future__ import print_function
-import time
-import brevo_python
-from brevo_python.rest import ApiException
-from pprint import pprint
+def buevo_send_email():
+    # 配置API密钥
+    configuration = sib_api_v3_sdk.Configuration()
+    configuration.api_key['api-key'] = YOUR_API_V3_KEY
 
-def send_brevo_email():
-    # Configure API key authorization: api-key
-    configuration = brevo_python.Configuration()
-    configuration.api_key['api-key'] = YOUR_API_KEY
-    # Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-    # configuration.api_key_prefix['api-key'] = 'Bearer'
-    # Configure API key authorization: partner-key
-    configuration = brevo_python.Configuration()
-    configuration.api_key['partner-key'] = YOUR_API_KEY
-    # Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-    # configuration.api_key_prefix['partner-key'] = 'Bearer'
+    # 创建API实例
+    api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
 
-    # create an instance of the API class
-    api_instance = brevo_python.EmailCampaignsApi(brevo_python.ApiClient(configuration))
-    campaign_id = 789 # int | Id of the campaign
-    email_to = brevo_python.SendTestEmail() # SendTestEmail |
+    # 创建发送邮件的内容
+    send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
+        to=[{'email': '453030291@qq.com', 'name': 'gms'}],
+        sender={'email': 'support@jinx-aa.xyz', 'name': 'jinx-support'},
+        subject='邮件主题',
+        html_content='<html><body><p>注册验证码:ABCD</p></body></html>'
+    )
 
     try:
-        # Send an email campaign to your test list
-        api_instance.send_test_email(campaign_id, email_to)
+        # 发送邮件
+        api_response = api_instance.send_transac_email(send_smtp_email)
+        print(api_response)
     except ApiException as e:
-        print("Exception when calling EmailCampaignsApi->send_test_email: %s\n" % e)
+        print("发送邮件时发生异常: %s\n" % e)
 
 if __name__ == '__main__':
     # youtube()
-    send_email()
+    # send_email()
+    buevo_send_email()

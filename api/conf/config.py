@@ -23,6 +23,7 @@ class Constant(BaseSettings):
     db_user: str = "db_user"
     db_password: str = "db_password"
     db_name: str = "db_name"
+    brevo_api_key: str = "brevo_api_key"
 
     class Config:
         if IS_PROD:

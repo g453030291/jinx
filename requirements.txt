@@ -17,5 +17,6 @@ controlnet-aux==0.0.9
 mediapipe==0.10.18
 opencv-python-headless==4.10.0.84
 yt-dlp==2024.11.18
+sib_api_v3_sdk==7.6.0
 #openai==1.54.3
 #dashscope==1.20.12

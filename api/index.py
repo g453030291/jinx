@@ -1,7 +1,7 @@
 import os
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi_pagination import add_pagination
 from loguru import logger
 
@@ -9,6 +9,7 @@ from api.conf import config
 from api.conf.exception_interceptor import ExceptionInterceptor
 from api.crawler import youtube
 from api.routers import file, base, task, image, user, login
+from api.service.auth_service import get_current_user
 
 API_END_POINTS = '/api'
 
@@ -30,12 +31,10 @@ add_pagination(app)
 app.add_exception_handler(HTTPException, ExceptionInterceptor.http_exception_handler)
 app.add_exception_handler(Exception, ExceptionInterceptor.general_exception_handler)
 
-
-
 app.include_router(base.router, prefix='')
-app.include_router(file.router, prefix=API_END_POINTS)
-app.include_router(task.router, prefix=API_END_POINTS)
-app.include_router(image.router, prefix=API_END_POINTS)
-app.include_router(youtube.router, prefix=API_END_POINTS)
-app.include_router(user.router, prefix=API_END_POINTS)
+app.include_router(file.router, prefix=API_END_POINTS, dependencies=[Depends(get_current_user)])
+app.include_router(task.router, prefix=API_END_POINTS, dependencies=[Depends(get_current_user)])
+app.include_router(image.router, prefix=API_END_POINTS, dependencies=[Depends(get_current_user)])
+app.include_router(youtube.router, prefix=API_END_POINTS, dependencies=[Depends(get_current_user)])
+app.include_router(user.router, prefix=API_END_POINTS, dependencies=[Depends(get_current_user)])
 app.include_router(login.router, prefix=API_END_POINTS)

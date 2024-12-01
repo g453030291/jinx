@@ -8,11 +8,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from api.client import dashscope_client
 from api.client.aliyun_client import AliyunClient
 from api.model.task import TaskParams, Task
+from api.model.user import User
 
-async def task_processing(session: AsyncSession, task_params: TaskParams):
+
+async def task_processing(session: AsyncSession, current_user: User, task_params: TaskParams):
     task_params_dict = task_params.model_dump()
     task = Task(**task_params_dict)
     task.task_status = 3
+    task.create_id = current_user.id
     if task.task_type == 1:
         task.task_content = task_params.image_translate_params.model_dump()
         aliyun_client = AliyunClient()

@@ -9,7 +9,7 @@ from fastapi import APIRouter, Body
 from api.conf import config
 from api.conf.config import SessionDep
 from api.model.resp import Resp
-from api.model.user import UserQuery, User
+from api.model.user import UserQuery, User, CacheUser
 from api.util import str_util
 from api.util.brevo_util import BrevoUtil
 
@@ -41,9 +41,9 @@ async def login_or_register(session: SessionDep, userQuery: UserQuery = Body(...
         await session.commit()
         await session.refresh(login_user)
 
-    cache_user = await session.execute(select(User).where(User.id == login_user.id))
-    cache_user = cache_user.scalars().first()
-    cache_user = {'id': cache_user.id, 'email': cache_user.email}
+    db_user = await session.execute(select(User).where(User.id == login_user.id))
+    db_user = db_user.scalars().first()
+    cache_user = CacheUser(**db_user.dict())
     token = jwt.encode(cache_user, 'jinxtestp', algorithm='HS256')
     config.redis.set(token, json.dumps(cache_user), ex=60 * 60 * 24 * 14)
     return Resp.success(data={"token": token})

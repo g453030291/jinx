@@ -30,5 +30,5 @@ class AliyunClient:
 if __name__ == '__main__':
     aliyun_client = AliyunClient()
     url = 'http://tristana-oss.oss-cn-shanghai.aliyuncs.com/2024/10/26/testpic1.jpg?OSSAccessKeyId=LTAI5tMS3r8LEYPeTe1m6sQQ&Expires=1730825233&Signature=F1TNDVvkel%2FBSbK5Q6RgZ1PDdbg%3D'
-    result = aliyun_client.translate_image(url, 'en', 'zh')
+    result = aliyun_client.translate_image(url, 'en', 'zh', False)
     print(result)

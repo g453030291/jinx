@@ -1,6 +1,6 @@
 from typing import Any
 
-from fastapi import APIRouter, HTTPException, Body, BackgroundTasks
+from fastapi import APIRouter, HTTPException, Body, BackgroundTasks, Depends
 from fastapi_pagination import Params
 from fastapi_pagination.ext.sqlalchemy import paginate
 from sqlalchemy.future import select
@@ -8,14 +8,19 @@ from sqlalchemy.future import select
 from api.conf.config import SessionDep
 from api.model.resp import Resp
 from api.model.task import Task, TaskQuery, TaskParams
+from api.model.user import User
 from api.service import task_service
+from api.service.auth_service import get_current_user
 
 router = APIRouter()
 
 @router.post("/task/create", response_model=Resp)
-def create_task(background_tasks: BackgroundTasks, session: SessionDep, task_params: TaskParams) -> Any:
+def create_task(background_tasks: BackgroundTasks,
+                session: SessionDep,
+                task_params: TaskParams,
+                current_user: User = Depends(get_current_user)) -> Any:
     try:
-        background_tasks.add_task(task_service.task_processing, session, task_params)
+        background_tasks.add_task(task_service.task_processing, session, current_user, task_params)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     return Resp.success('task processing')

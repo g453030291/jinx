@@ -31,3 +31,6 @@ class UserQuery(BaseModel):
     status: Optional[int] = None
     verification_code: Optional[str] = None
 
+class CacheUser(BaseModel):
+    id: int
+    email: str

@@ -29,6 +29,7 @@ class Constant(BaseSettings):
     redis_host: str = "redis_host"
     redis_port: str = "redis_port"
     redis_password: str = "redis_password"
+    huggingface_token: str = "huggingface_token"
 
     class Config:
         if IS_PROD:

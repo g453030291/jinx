@@ -8,7 +8,7 @@ from loguru import logger
 from api.conf import config
 from api.conf.exception_interceptor import ExceptionInterceptor
 from api.crawler import youtube
-from api.routers import file, base, task, image, user, login
+from api.routers import file, base, task, image, user, login, audio
 from api.service.auth_service import get_current_user
 
 API_END_POINTS = '/api'
@@ -37,4 +37,5 @@ app.include_router(task.router, prefix=API_END_POINTS, dependencies=[Depends(get
 app.include_router(image.router, prefix=API_END_POINTS, dependencies=[Depends(get_current_user)])
 app.include_router(youtube.router, prefix=API_END_POINTS, dependencies=[Depends(get_current_user)])
 app.include_router(user.router, prefix=API_END_POINTS, dependencies=[Depends(get_current_user)])
+app.include_router(audio.router, prefix=API_END_POINTS, dependencies=[Depends(get_current_user)])
 app.include_router(login.router, prefix=API_END_POINTS)

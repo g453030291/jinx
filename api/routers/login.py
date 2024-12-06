@@ -29,7 +29,7 @@ def send_code(userQuery: UserQuery = Body(...)):
 async def login_or_register(session: SessionDep, userQuery: UserQuery = Body(...)):
     email = config.redis.get(userQuery.verification_code)
     if not email:
-        return Resp.error("Verification code error")
+        return Resp.fail("Verification code error")
     statement = select(User).where(User.email == email)
     result = await session.execute(statement)
     login_user = result.scalars().first()

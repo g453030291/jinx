@@ -9,7 +9,7 @@ from api.conf import config
 from api.conf.exception_interceptor import ExceptionInterceptor
 from api.crawler import youtube
 from api.routers import file_router, base, task_router, image_router, user_router, login_router, audio_router, \
-    llm_router
+    llm_router, enum_router
 from api.service.auth_service import get_current_user
 
 API_END_POINTS = '/api'
@@ -41,3 +41,4 @@ app.include_router(youtube.router, prefix=API_END_POINTS, dependencies=[Depends(
 app.include_router(user_router.router, prefix=API_END_POINTS, dependencies=[Depends(get_current_user)])
 app.include_router(audio_router.router, prefix=API_END_POINTS, dependencies=[Depends(get_current_user)])
 app.include_router(llm_router.router, prefix=API_END_POINTS, dependencies=[Depends(get_current_user)])
+app.include_router(enum_router.router, prefix=API_END_POINTS, dependencies=[Depends(get_current_user)])

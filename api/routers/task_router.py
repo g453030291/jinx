@@ -12,9 +12,9 @@ from api.model.user import User
 from api.service import task_service
 from api.service.auth_service import get_current_user
 
-router = APIRouter()
+router = APIRouter(prefix="/task")
 
-@router.post("/task/create", response_model=Resp)
+@router.post("/create", response_model=Resp)
 def create_task(background_tasks: BackgroundTasks,
                 session: SessionDep,
                 task_params: TaskParams,
@@ -25,7 +25,7 @@ def create_task(background_tasks: BackgroundTasks,
         raise HTTPException(status_code=500, detail=str(e))
     return Resp.success('task processing')
 
-@router.post("/task/list", response_model=Resp)
+@router.post("/list", response_model=Resp)
 async def list_tasks(session: SessionDep, taskQuery: TaskQuery = Body(...)) -> Any:
     filters = []
     filters.append(Task.delete == 0)
@@ -45,7 +45,7 @@ async def list_tasks(session: SessionDep, taskQuery: TaskQuery = Body(...)) -> A
     page_result = await paginate(session, query, params=page_params)
     return Resp.success(data=page_result)
 
-@router.post("/task/delete", response_model=Resp)
+@router.post("/delete", response_model=Resp)
 async def delete_task(session: SessionDep, id: int = Body(..., embed=True)) -> Any:
     try:
         statement = select(Task).where(Task.id == id)
@@ -60,3 +60,11 @@ async def delete_task(session: SessionDep, id: int = Body(..., embed=True)) -> A
         session.rollback()
         raise HTTPException(status_code=500, detail=str(e))
     return Resp.success(True)
+
+@router.get("/{id}", response_model=Resp)
+async def get_task(session: SessionDep, id: int) -> Any:
+    statement = select(Task).where(Task.id == id)
+    result = (await session.execute(statement)).scalars().first()
+    if not result:
+        raise HTTPException(status_code=404, detail="Task not found")
+    return Resp.success(data=result)

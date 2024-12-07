@@ -30,6 +30,7 @@ class Constant(BaseSettings):
     redis_port: str = "redis_port"
     redis_password: str = "redis_password"
     huggingface_token: str = "huggingface_token"
+    doubao_api_key: str = "doubao_api_key"
 
     class Config:
         if IS_PROD:

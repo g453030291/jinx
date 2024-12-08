@@ -31,6 +31,8 @@ class Constant(BaseSettings):
     redis_password: str = "redis_password"
     huggingface_token: str = "huggingface_token"
     doubao_api_key: str = "doubao_api_key"
+    keling_access_key_id: str = "keling_access_key_id"
+    keling_access_key_secret: str = "keling_access_key_secret"
 
     class Config:
         if IS_PROD:

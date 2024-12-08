@@ -13,7 +13,7 @@ class Task(SQLModel, table=True):
     __table_args__ = {"schema": "j_base"}
 
     id: Optional[int] = Field(default=None, primary_key=True, description="任务ID")
-    task_type: int = Field(default=0, description="任务类型:1=图片翻译,2=背景生成")
+    task_type: int = Field(default=0, description="任务类型:1=图片翻译,2=背景生成,3=图生视频")
     task_status: int = Field(default=0, description="任务状态:0=初始化,1=执行中, 2=成功,3=失败")
     fail_msg: str = Field(default="", max_length=256, description="任务失败原因")
     task_name: str = Field(default="", max_length=56, description="任务名称")
@@ -34,7 +34,7 @@ class Task(SQLModel, table=True):
 
 class TaskQuery(Pagination):
     id: int = Field(default=None, description="任务ID")
-    task_type: int = Field(default=0, description="任务类型:1=图片翻译")
+    task_type: int = Field(default=0, description="任务类型:1=图片翻译,2=背景生成,3=图生视频")
     task_status: int = Field(default=0, description="任务状态:0=初始化,1=执行中, 2=成功,3=失败")
     task_name: str = Field(default="", description="任务名称")
     create_id: int = Field(default=0, description="创建者ID")
@@ -61,11 +61,27 @@ class BackgroundGenerationParams(BaseModel):
     class Config:
         protected_namespaces = ()
 
+class ImageToVideoParams(BaseModel):
+    model_name: str = Field(default="", description="模型名称:kling-v1, kling-v1-5")
+    image: str = Field(default="", description="图片URL")
+    mode: str = Field(default="", description="生成视频的模式:std，pro")
+    # image_tail: str = Field(default="", max_length=512, description="参考图像(尾帧控制)url")
+    prompt: str = Field(default="", description="正向提示词")
+    negative_prompt: str = Field(default="", description="负向提示词")
+    cfg_scale: float = Field(default="", description="生成视频的自由度")
+    static_mask: str = Field(default="", description="静态遮罩图 url")
+    # dynamic_masks: Optional[List[dict]] = Field(default=None, description="动态遮罩")
+    duration: int = Field(default="", description="时长[5，10]")
+
+    class Config:
+        protected_namespaces = ()
+
 class TaskParams(BaseModel):
-    task_type: int = Field(default=0, description="任务类型:1=图片翻译,2=背景生成")
+    task_type: int = Field(default=0, description="任务类型:1=图片翻译,2=背景生成,3=图生视频")
     task_name: str = Field(default="", max_length=56, description="任务名称")
     image_translate_params: Optional[ImageTranslateParams] = Field(default=None, description="图片翻译参数")
     background_generation_params: Optional[BackgroundGenerationParams] = Field(default=None, description="背景生成参数")
+    image_to_video_params: Optional[ImageToVideoParams] = Field(default=None, description="图片生成视频参数")
 
 
 

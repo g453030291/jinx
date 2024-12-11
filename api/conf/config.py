@@ -6,6 +6,7 @@ import certifi
 import redis
 from fastapi import Depends
 from pydantic.v1 import BaseSettings
+from sqlalchemy import AsyncAdaptedQueuePool
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 
@@ -57,6 +58,10 @@ constant = Constant()
 engine = create_async_engine(
     f"postgresql+asyncpg://{constant.db_user}:{constant.db_password}@{constant.db_host}:{constant.db_port}/{constant.db_name}",
     # connect_args={"ssl": ssl_context}
+    poolclass=AsyncAdaptedQueuePool,
+    pool_size=10,
+    max_overflow=5,
+    pool_recycle=3600
 )
 
 # 创建异步会话工厂

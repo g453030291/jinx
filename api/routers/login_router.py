@@ -21,7 +21,7 @@ def send_code(userQuery: UserQuery = Body(...)):
     ver_code = str_util.generate_random_code()
     brevo_util = BrevoUtil()
     brevo_util.send_verification_email(userQuery.email, ver_code)
-    config.redis.set(ver_code, userQuery.email, ex=60)
+    config.redis.set(ver_code, userQuery.email, ex=600)
     return Resp.success('The verification code has been sent to your email, please check.')
 
 # 登录

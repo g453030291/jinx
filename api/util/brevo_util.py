@@ -15,7 +15,10 @@ class BrevoUtil:
             to=[{'email': email_address}],
             sender={'email': 'support@jinx-aa.xyz', 'name': 'jinx-support'},
             subject='邮件验证',
-            html_content=f'<html><body><p>注册验证码: {verification_code}</p></body></html>'
+            html_content=f'<html><body>'
+                         f'<p>您正在使用该邮箱验证登录: {verification_code}</p>'
+                         f'<p>非本人操作请忽略</p>'
+                         f'</body></html>'
         )
         try:
             api_response = self.api_instance.send_transac_email(send_smtp_email)

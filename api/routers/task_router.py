@@ -65,7 +65,7 @@ async def list_tasks(session: SessionDep, taskQuery: TaskQuery = Body(...)) -> A
 async def delete_task(session: SessionDep, id: int = Body(..., embed=True)) -> Any:
     try:
         statement = select(Task).where(Task.id == id)
-        result = session.execute(statement).scalars().first()
+        result = (await session.execute(statement)).scalars().first()
         if not result:
             raise HTTPException(status_code=404, detail="Task not found")
         result.delete = 1
@@ -73,7 +73,7 @@ async def delete_task(session: SessionDep, id: int = Body(..., embed=True)) -> A
         await session.commit()
         await session.refresh(result)
     except Exception as e:
-        session.rollback()
+        await session.rollback()
         raise HTTPException(status_code=500, detail=str(e))
     return Resp.success(True)
 

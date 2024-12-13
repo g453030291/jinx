@@ -18,7 +18,7 @@ class Task(SQLModel, table=True):
     fail_msg: str = Field(default="", max_length=256, description="任务失败原因")
     task_name: str = Field(default="", max_length=56, description="任务名称")
     finish_url: Optional[dict] = Field(default=None, sa_column=Column(JSON), description="完成URL")
-    finish_time: datetime = Field(default=datetime(1970, 1, 1, 8, 0, 0), description="完成时间")
+    finish_time: datetime = Field(default=datetime(1970, 1, 1, 8, 0, 1), description="完成时间")
     task_content: Optional[dict] = Field(default=None, sa_column=Column(JSON), description="任务内容")
     create_id: int = Field(default=0, description="创建者ID")
     create_name: Optional[str] = Field(default="", max_length=56, description="创建者名称")
@@ -26,7 +26,7 @@ class Task(SQLModel, table=True):
     update_at: datetime = Field(default_factory=datetime.utcnow, description="更新时间")
     update_id: int = Field(default=0, description="更新者ID")
     update_name: Optional[str] = Field(default="", max_length=56, description="更新者名称")
-    delete_at: datetime = Field(default=datetime(1970, 1, 1, 8, 0, 0), description="删除时间")
+    delete_at: datetime = Field(default=datetime(1970, 1, 1, 8, 0, 1), description="删除时间")
     delete: int = Field(default=0, description="是否删除:0=未删除,1=已删除")
 
     class Config:

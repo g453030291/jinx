@@ -43,6 +43,13 @@ async def task_processing(session: AsyncSession, task: Task, task_params: TaskPa
         task.finish_url = result_urls
         if not is_success:
             task.fail_msg = "图片生成视频失败"
+    elif task.task_type == 4:
+        aliyun_client = AliyunClient()
+        is_success, finish_url = await segment_commodity(aliyun_client, task_params.image_segment_params.image_url)
+        task.finish_url = [finish_url]
+        if not is_success:
+            task.fail_msg = "商品分割失败"
+        logger.info(f"商品分割{is_success}, finish_url: {finish_url}")
     elif task.task_type == 100:
         task.finish_url = ["https:xxx.com"]
         is_success = True
@@ -58,6 +65,13 @@ async def task_processing(session: AsyncSession, task: Task, task_params: TaskPa
 # 图片翻译任务
 async def translate_image(aliyun_client, url, source_language, target_language, ignore_entity_recognize):
     result = await aliyun_client.translate_image(url, source_language, target_language, ignore_entity_recognize)
+    if result.status_code != 200:
+        return False, result.data.message
+    return True, result.body.data.final_image_url
+
+# 抠图任务
+async def segment_commodity(aliyun_client, url):
+    result = await aliyun_client.segment_commodity(url)
     if result.status_code != 200:
         return False, result.data.message
     return True, result.body.data.final_image_url

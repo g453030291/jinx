@@ -52,4 +52,5 @@ def task_type():
         {"name": "图片翻译", "en": "Image Translation", "value": 1},
         {"name": "背景生成", "en": "Background Generation", "value": 2},
         {"name": "图生视频", "en": "Image to Video", "value": 3},
+        {"name": "分割抠图", "en": "Image Segment", "value": 4}
     ])

@@ -31,6 +31,8 @@ async def create_task(background_tasks: BackgroundTasks,
             task.task_content = task_params.background_generation_params.model_dump()
         elif task.task_type == 3:
             task.task_content = task_params.image_to_video_params.model_dump()
+        elif task.task_type == 4:
+            task.task_content = task_params.image_segment_params.model_dump()
 
         session.add(task)
         await session.commit()

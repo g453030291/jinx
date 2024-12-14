@@ -36,26 +36,26 @@ async def generate_background(
     }
 
     # 添加可选的 input 参数
-    if ref_image_url is not None:
+    if ref_image_url:
         data["input"]["ref_image_url"] = ref_image_url
-    if ref_prompt is not None:
+    if ref_prompt:
         data["input"]["ref_prompt"] = ref_prompt
-    if foreground_edges is not None:
+    if foreground_edges:
         data["input"]["reference_edge"]["foreground_edge"] = foreground_edges
-    if background_edges is not None:
+    if background_edges:
         data["input"]["reference_edge"]["background_edge"] = background_edges
-    if foreground_edge_prompt is not None:
+    if foreground_edge_prompt:
         data["input"]["reference_edge"]["foreground_edge_prompt"] = foreground_edge_prompt
-    if background_edge_prompt is not None:
+    if background_edge_prompt:
         data["input"]["reference_edge"]["background_edge_prompt"] = background_edge_prompt
 
     # 构建可选的 parameters 参数
     parameters = {}
     if n is not None:
         parameters["n"] = n
-    if ref_prompt_weight is not None:
+    if ref_prompt_weight:
         parameters["ref_prompt_weight"] = ref_prompt_weight
-    if model_version is not None:
+    if model_version:
         parameters["model_version"] = model_version
     if parameters:
         data["parameters"] = parameters

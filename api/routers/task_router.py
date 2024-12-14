@@ -23,7 +23,7 @@ async def create_task(background_tasks: BackgroundTasks,
     try:
         task_params_dict = task_params.model_dump()
         task = Task(**task_params_dict)
-        task.task_status = 3
+        task.task_status = 1
         task.create_id = current_user.id
         if task.task_type == 1:
             task.task_content = task_params.image_translate_params.model_dump()

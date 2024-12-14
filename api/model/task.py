@@ -31,11 +31,14 @@ class Task(SQLModel, table=True):
 
     class Config:
         from_attributes = True
+        json_encoders = {
+            datetime: lambda v: v.strftime('%Y-%m-%d %H:%M:%S'),
+        }
 
 class TaskQuery(Pagination):
     id: int = Field(default=None, description="任务ID")
-    task_type: int = Field(default=0, description="任务类型:1=图片翻译,2=背景生成,3=图生视频")
-    task_status: int = Field(default=0, description="任务状态:0=初始化,1=执行中, 2=成功,3=失败")
+    task_type: str = Field(default=None, description="任务类型:1=图片翻译,2=背景生成,3=图生视频")
+    task_status: str = Field(default=None, description="任务状态:0=初始化,1=执行中, 2=成功,3=失败")
     task_name: str = Field(default="", description="任务名称")
     create_id: int = Field(default=0, description="创建者ID")
 

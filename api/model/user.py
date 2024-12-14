@@ -22,6 +22,9 @@ class User(SQLModel, table=True):
 
     class Config:
         from_attributes = True
+        json_encoders = {
+            datetime: lambda v: v.strftime('%Y-%m-%d %H:%M:%S'),
+        }
 
 class UserQuery(BaseModel):
     id: Optional[int] = None

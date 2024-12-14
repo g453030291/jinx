@@ -2,6 +2,7 @@ import asyncio
 import json
 from datetime import datetime
 
+from Tea.exceptions import TeaException
 from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -18,8 +19,9 @@ async def task_processing(session: AsyncSession, task: Task, task_params: TaskPa
                                                   task_params.image_translate_params.source_language,
                                                   task_params.image_translate_params.target_language,
                                                   task_params.image_translate_params.ignore_entity_recognize)
-        task.finish_url = [finish_url]
-        if not is_success:
+        if is_success:
+            task.finish_url = [finish_url]
+        else:
             task.fail_msg = "图片翻译失败"
         logger.info(f"图片翻译{is_success}, finish_url: {finish_url}")
     elif task.task_type == 2:
@@ -33,22 +35,25 @@ async def task_processing(session: AsyncSession, task: Task, task_params: TaskPa
                                                           task_params.background_generation_params.n,
                                                           task_params.background_generation_params.ref_prompt_weight,
                                                           task_params.background_generation_params.model_version)
-        task.finish_url = result_urls
-        if not is_success:
-            task.fail_msg = "背景生成失败"
+        if is_success:
+            task.finish_url = result_urls
+        else:
+            task.fail_msg = f"背景生成失败: {result_urls}"
         logger.info(f"背景生成{is_success}, finish_url: {result_urls}")
     elif task.task_type == 3:
         task.task_content = task_params.image_to_video_params.model_dump()
         is_success, result_urls = await image_to_video_service(task_params.image_to_video_params)
-        task.finish_url = result_urls
-        if not is_success:
+        if is_success:
+            task.finish_url = result_urls
+        else:
             task.fail_msg = "图片生成视频失败"
     elif task.task_type == 4:
         aliyun_client = AliyunClient()
         is_success, finish_url = await segment_commodity(aliyun_client, task_params.image_segment_params.image_url)
-        task.finish_url = [finish_url]
-        if not is_success:
-            task.fail_msg = "商品分割失败"
+        if is_success:
+            task.finish_url = [finish_url]
+        else:
+            task.fail_msg = f"商品分割失败: {finish_url}"
         logger.info(f"商品分割{is_success}, finish_url: {finish_url}")
     elif task.task_type == 100:
         task.finish_url = ["https:xxx.com"]
@@ -71,10 +76,13 @@ async def translate_image(aliyun_client, url, source_language, target_language, 
 
 # 抠图任务
 async def segment_commodity(aliyun_client, url):
-    result = await aliyun_client.segment_commodity(url)
-    if result.status_code != 200:
-        return False, result.data.message
-    return True, result.body.data.final_image_url
+    try:
+        result = await aliyun_client.segment_commodity(url)
+        if result.status_code != 200:
+            return False, result['Message']
+        return True, result.body.data.image_url
+    except TeaException as e:
+        return False, e.message
 
 # 图像背景生成
 async def background_generation(base_image_url, ref_image_url, ref_prompt, foreground_edges, background_edges,

@@ -42,9 +42,11 @@ async def create_task(background_tasks: BackgroundTasks,
     return Resp.success('task processing')
 
 @router.post("/list", response_model=Resp)
-async def list_tasks(session: SessionDep, taskQuery: TaskQuery = Body(...)) -> Any:
+async def list_tasks(session: SessionDep, current_user: User = Depends(get_current_user), taskQuery: TaskQuery = Body(...)) -> Any:
+    logger.info(f"当前登录用户id={current_user.id}")
     filters = []
     filters.append(Task.delete == 0)
+    filters.append(Task.create_id == current_user.id)
     if taskQuery.id:
         filters.append(Task.id == taskQuery.id)
     if taskQuery.task_type:
@@ -53,8 +55,6 @@ async def list_tasks(session: SessionDep, taskQuery: TaskQuery = Body(...)) -> A
         filters.append(Task.task_status == taskQuery.task_status)
     if taskQuery.task_name:
         filters.append(Task.task_name.ilike(f"%{taskQuery.task_name}%"))
-    if taskQuery.create_id:
-        filters.append(Task.create_id == taskQuery.create_id)
 
     query = select(Task).where(*filters) if filters else select(Task)
     page_params = Params(page=taskQuery.page, size=taskQuery.size)

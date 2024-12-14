@@ -14,7 +14,7 @@ from api.model.user import User
 async def task_processing(session: AsyncSession, task: Task, task_params: TaskParams):
     if task.task_type == 1:
         aliyun_client = AliyunClient()
-        is_success, finish_url =  translate_image(aliyun_client, task_params.image_translate_params.origin_url,
+        is_success, finish_url = await translate_image(aliyun_client, task_params.image_translate_params.origin_url,
                                                   task_params.image_translate_params.source_language,
                                                   task_params.image_translate_params.target_language,
                                                   task_params.image_translate_params.ignore_entity_recognize)
@@ -56,8 +56,8 @@ async def task_processing(session: AsyncSession, task: Task, task_params: TaskPa
     await session.commit()
 
 # 图片翻译任务
-def translate_image(aliyun_client, url, source_language, target_language, ignore_entity_recognize):
-    result = aliyun_client.translate_image(url, source_language, target_language, ignore_entity_recognize)
+async def translate_image(aliyun_client, url, source_language, target_language, ignore_entity_recognize):
+    result = await aliyun_client.translate_image(url, source_language, target_language, ignore_entity_recognize)
     if result.status_code != 200:
         return False, result.data.message
     return True, result.body.data.final_image_url

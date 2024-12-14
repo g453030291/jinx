@@ -44,3 +44,12 @@ def target_language(language: str):
             {"name": "Korean", "value": "ko"}
         ]
     return Resp.success(data=result_map)
+
+
+@router.get("/task/type", response_model=Resp)
+def task_type():
+    return Resp.success(data=[
+        {"name": "图片翻译", "en": "Image Translation", "value": 1},
+        {"name": "背景生成", "en": "Background Generation", "value": 2},
+        {"name": "图生视频", "en": "Image to Video", "value": 3},
+    ])

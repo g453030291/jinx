@@ -1,3 +1,4 @@
+import asyncio
 import json
 
 from api.conf.config import constant
@@ -19,16 +20,21 @@ class AliyunClient:
         self.alimt_client = alimt20181012Client(config)
 
     # 图片翻译
-    def translate_image(self, target_url, source_language, target_language, ignore_entity_recognize) -> alimt_20181012_models.TranslateImageResponse:
+    async def translate_image(self, target_url, source_language, target_language, ignore_entity_recognize) -> alimt_20181012_models.TranslateImageResponse:
         translate_image_request = alimt_20181012_models.TranslateImageRequest()
         translate_image_request.image_url = target_url
         translate_image_request.source_language = source_language
         translate_image_request.target_language = target_language
         translate_image_request.ext = json.dumps({"ignoreEntityRecognize": ignore_entity_recognize})
-        return self.alimt_client.translate_image_with_options(translate_image_request, util_models.RuntimeOptions())
+        await asyncio.sleep(5)
+        result = await self.alimt_client.translate_image_with_options_async(translate_image_request, util_models.RuntimeOptions())
+        return result
+
+async def test():
+    aliyun_client = AliyunClient()
+    url = 'https://tristana-oss.oss-cn-shanghai.aliyuncs.com/2024/12/14/test_pic1.jpg'
+    result = await aliyun_client.translate_image(url, 'en', 'zh', False)
+    print(result)
 
 if __name__ == '__main__':
-    aliyun_client = AliyunClient()
-    url = 'http://tristana-oss.oss-cn-shanghai.aliyuncs.com/2024/10/26/testpic1.jpg?OSSAccessKeyId=LTAI5tMS3r8LEYPeTe1m6sQQ&Expires=1730825233&Signature=F1TNDVvkel%2FBSbK5Q6RgZ1PDdbg%3D'
-    result = aliyun_client.translate_image(url, 'en', 'zh', False)
-    print(result)
+    asyncio.run(test())

@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi_pagination import add_pagination
 from loguru import logger
+from fastapi.middleware.cors import CORSMiddleware
 
 from api.conf import config
 from api.conf.exception_interceptor import ExceptionInterceptor
@@ -31,6 +32,17 @@ logger.info(f'is_prod: {config.IS_PROD}')
 add_pagination(app)
 app.add_exception_handler(HTTPException, ExceptionInterceptor.http_exception_handler)
 app.add_exception_handler(Exception, ExceptionInterceptor.general_exception_handler)
+origins = [
+    "https://www.jinx-aa.xyz",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(base.router, prefix='')
 app.include_router(login_router.router, prefix=API_END_POINTS)

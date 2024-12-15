@@ -41,11 +41,12 @@ def foreground_edges_generate(o_url: str = Body(..., embed=True)):
 
     return Resp.success(data=oss_url)
 
-# 生成虚拟人脸图
+# 随机图片:https://picsum.photos/
 @router.get("/fictional/face", response_model=Resp)
 def fictional_face():
     oss_client = OSSClient()
-    response = requests.get("https://thispersondoesnotexist.com")
+    cat = requests.get("https://api.thecatapi.com/v1/images/search?limit=1")
+    response = requests.get(cat.json()['url'])
     response.raise_for_status()
     picture = response.content
     file_name = uuid.uuid4().hex + ".jpeg"

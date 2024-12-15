@@ -18,10 +18,14 @@ router = APIRouter()
 # 发送验证码
 @router.post("/send_code", response_model=Resp)
 def send_code(userQuery: UserQuery = Body(...)):
+    code = config.redis.get(userQuery.email)
+    if code:
+        return Resp.fail("Please do not send too frequently")
     ver_code = str_util.generate_random_code()
     brevo_util = BrevoUtil()
     brevo_util.send_verification_email(userQuery.email, ver_code)
-    config.redis.set(ver_code, userQuery.email, ex=600)
+    config.redis.set(ver_code, userQuery.email, ex=120)
+    config.redis.set(userQuery.email, ver_code, ex=120)
     return Resp.success('The verification code has been sent to your email, please check.')
 
 # 登录

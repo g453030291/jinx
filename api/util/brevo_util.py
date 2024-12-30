@@ -1,4 +1,5 @@
 import sib_api_v3_sdk
+from loguru import logger
 from sib_api_v3_sdk.rest import ApiException
 
 from api.conf.config import constant
@@ -24,7 +25,7 @@ class BrevoUtil:
             api_response = self.api_instance.send_transac_email(send_smtp_email)
             return api_response
         except ApiException as e:
-            print(f"Exception when sending email: {e}")
+            logger.info(f"Exception when sending email: {e}")
             return e
 
 if __name__ == '__main__':

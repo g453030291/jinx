@@ -23,6 +23,7 @@ class BrevoUtil:
         )
         try:
             api_response = self.api_instance.send_transac_email(send_smtp_email)
+            logger.info(f"Email sent response: {api_response}")
             return api_response
         except ApiException as e:
             logger.info(f"Exception when sending email: {e}")

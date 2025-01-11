@@ -64,7 +64,9 @@ engine = create_async_engine(
         port=constant.db_port,
         db_name=constant.db_name
     ),
-    echo=True
+    echo=True,
+    pool_recycle=3600,
+    pool_pre_ping=True
 )
 
 # 创建异步会话工厂

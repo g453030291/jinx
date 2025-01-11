@@ -15,27 +15,44 @@ from api.model.user import User
 async def task_processing(session: AsyncSession, task: Task, task_params: TaskParams):
     if task.task_type == 1:
         aliyun_client = AliyunClient()
-        is_success, finish_url = await translate_image(aliyun_client, task_params.image_translate_params.origin_url,
-                                                  task_params.image_translate_params.source_language,
-                                                  task_params.image_translate_params.target_language,
-                                                  task_params.image_translate_params.ignore_entity_recognize)
-        if is_success:
-            task.finish_url = [finish_url]
+        finish_urls = []
+        fail_msgs = []
+        for url in task_params.image_translate_params.origin_urls:
+            is_success, finish_url = await translate_image(aliyun_client, url,
+                                              task_params.image_translate_params.source_language,
+                                              task_params.image_translate_params.target_language,
+                                              task_params.image_translate_params.ignore_entity_recognize)
+            if is_success:
+                finish_urls.append(finish_url)
+            else:
+                fail_msgs.append(f"图片翻译失败: {finish_url}")
+        if len(finish_urls) > 0:
+            task.finish_url = finish_urls
         else:
-            task.fail_msg = "图片翻译失败"
-        logger.info(f"图片翻译{is_success}, finish_url: {finish_url}")
+            task.fail_msg = json.dumps(fail_msgs)
+        logger.info(f"图片翻译{len(finish_urls) > 0}, finish_url: {finish_urls}")
     elif task.task_type == 2:
-        is_success, result_urls = await background_generation(task_params.background_generation_params.origin_url,
-                                                          task_params.background_generation_params.ref_image_url,
-                                                          task_params.background_generation_params.ref_prompt,
-                                                          task_params.background_generation_params.foreground_edges,
-                                                          task_params.background_generation_params.background_edges,
-                                                          task_params.background_generation_params.foreground_edge_prompts,
-                                                          task_params.background_generation_params.background_edge_prompts,
-                                                          task_params.background_generation_params.n,
-                                                          task_params.background_generation_params.ref_prompt_weight,
-                                                          task_params.background_generation_params.model_version)
-        if is_success:
+        aliyun_client = AliyunClient()
+        segment_is_success, finish_url = await segment_commodity(aliyun_client, task_params.background_generation_params.origin_url)
+        if segment_is_success:
+            task_params.background_generation_params.origin_url = [finish_url]
+        else:
+            task.fail_msg = f"前置步骤,商品分割失败: {finish_url}"
+        logger.info(f"商品分割{segment_is_success}, finish_url: {finish_url}")
+        result_urls = []
+        is_success = False
+        if segment_is_success:
+            is_success, result_urls = await background_generation(task_params.background_generation_params.origin_url,
+                                                              task_params.background_generation_params.ref_image_url,
+                                                              task_params.background_generation_params.ref_prompt,
+                                                              task_params.background_generation_params.foreground_edges,
+                                                              task_params.background_generation_params.background_edges,
+                                                              task_params.background_generation_params.foreground_edge_prompts,
+                                                              task_params.background_generation_params.background_edge_prompts,
+                                                              task_params.background_generation_params.n,
+                                                              task_params.background_generation_params.ref_prompt_weight,
+                                                              task_params.background_generation_params.model_version)
+        if segment_is_success and is_success:
             task.finish_url = result_urls
         else:
             task.fail_msg = f"背景生成失败: {result_urls}"

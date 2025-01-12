@@ -1,5 +1,6 @@
 import asyncio
 import json
+import uuid
 from datetime import datetime
 
 from Tea.exceptions import TeaException
@@ -10,9 +11,11 @@ from api.client import dashscope_client, keling_client
 from api.client.aliyun_client import AliyunClient
 from api.model.task import TaskParams, Task, ImageToVideoParams
 from api.model.user import User
+from api.service import llm_service
 
 
 async def task_processing(session: AsyncSession, task: Task, task_params: TaskParams):
+    task.t_uuid = uuid.uuid4().hex
     if task.task_type == 1:
         aliyun_client = AliyunClient()
         finish_urls = []
@@ -42,6 +45,10 @@ async def task_processing(session: AsyncSession, task: Task, task_params: TaskPa
         result_urls = []
         is_success = False
         if segment_is_success:
+            ref_prompt = llm_service.background_generation_prompts(task_params.background_generation_params.image_style,
+                                                                   task_params.background_generation_params.app_location)
+            logger.info(f"doubao生成prompts: {ref_prompt}")
+            task_params.background_generation_params.ref_prompt = ref_prompt
             is_success, result_urls = await background_generation(task_params.background_generation_params.origin_url,
                                                               task_params.background_generation_params.ref_image_url,
                                                               task_params.background_generation_params.ref_prompt,

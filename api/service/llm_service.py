@@ -53,9 +53,16 @@ def completions(system_prompts, user_prompts, model="ep-20241207172944-kk7t8", i
         )
     return completion.choices[0].message.content
 
+def background_generation_prompts(image_style, app_location):
+    system_prompts = """你是一个负责 AI 生成商品图背景的产品经理，十分擅长根据用户需求生成一个优秀的 prompts。
+这是一个用户的需求，请你生成 prompts返回。注意只返回一条合适的 prompts 即可。"""
+    user_prompts = f"用户需要一个{image_style}风格的商品图背景，应用于{app_location}。"
+    return completions(system_prompts=system_prompts, user_prompts=user_prompts)
+
 if __name__ == '__main__':
-    result = completions(system_prompts="", user_prompts="看一下这两张图片里都有什么", image_list=[
-        "http://tristana-oss.oss-cn-shanghai.aliyuncs.com/2024/12/07/WeChat4c873b73053bb6a23a0bc16997a951eb.jpg",
-        "http://tristana-oss.oss-cn-shanghai.aliyuncs.com/2024/12/07/WeChatb1a41731ac954a691f199d7fb3737001.jpg"
-    ])
+    result = background_generation_prompts("自然场景", "淘宝橱窗")
+    # result = completions(system_prompts="", user_prompts="看一下这两张图片里都有什么", image_list=[
+    #     "http://tristana-oss.oss-cn-shanghai.aliyuncs.com/2024/12/07/WeChat4c873b73053bb6a23a0bc16997a951eb.jpg",
+    #     "http://tristana-oss.oss-cn-shanghai.aliyuncs.com/2024/12/07/WeChatb1a41731ac954a691f199d7fb3737001.jpg"
+    # ])
     print(result)

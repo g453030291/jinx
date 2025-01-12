@@ -1,9 +1,11 @@
+import uuid
 from typing import Any
 
 from fastapi import APIRouter, HTTPException, Body, BackgroundTasks, Depends
 from fastapi_pagination import Params
 from fastapi_pagination.ext.sqlalchemy import paginate
 from loguru import logger
+from sqlalchemy import desc
 from sqlalchemy.future import select
 
 from api.conf.config import SessionDep
@@ -59,6 +61,7 @@ async def list_tasks(session: SessionDep, current_user: User = Depends(get_curre
         filters.append(Task.task_name.ilike(f"%{taskQuery.task_name}%"))
 
     query = select(Task).where(*filters) if filters else select(Task)
+    query = query.order_by(desc('id'))
     page_params = Params(page=taskQuery.page, size=taskQuery.size)
     page_result = await paginate(session, query, params=page_params)
     return Resp.success(data=page_result)

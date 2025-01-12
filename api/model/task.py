@@ -13,6 +13,7 @@ class Task(SQLModel, table=True):
     __table_args__ = {"schema": "j_base"}
 
     id: Optional[int] = Field(default=None, primary_key=True, description="任务ID")
+    t_uuid: str = Field(default="", max_length=32, description="任务UUID")
     task_type: int = Field(default=0, description="任务类型:1=图片翻译,2=背景生成,3=图生视频,4=分割抠图")
     task_status: int = Field(default=0, description="任务状态:0=初始化,1=执行中, 2=成功,3=失败")
     fail_msg: str = Field(default="", max_length=256, description="任务失败原因")
@@ -61,6 +62,8 @@ class BackgroundGenerationParams(BaseModel):
     n: Optional[int] = Field(default=None, description="数量")
     ref_prompt_weight: Optional[float] = Field(default=None, description="参考提示权重")
     model_version: Optional[str] = Field(default=None, max_length=56, description="模型版本")
+    image_style: Optional[str] = Field(default=None, max_length=56, description="图片风格")
+    app_location: Optional[str] = Field(default=None, max_length=56, description="应用位置")
 
     class Config:
         protected_namespaces = ()

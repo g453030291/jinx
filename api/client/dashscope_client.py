@@ -1,10 +1,20 @@
 import asyncio
 
+from loguru import logger
+from requests import request
+
 from api.conf.config import constant
 
 import httpx
 
 # aliyun 百炼大模型
+
+URL = 'https://dashscope.aliyuncs.com/api/v1/services/aigc/background-generation/generation/'
+HEADERS = {
+    'X-DashScope-Async': 'enable',
+    'Authorization': f'Bearer {constant.ali_bai_lian_api_key}',
+    'Content-Type': 'application/json'
+}
 
 # 生成背景
 # base_image_url必传,
@@ -21,12 +31,6 @@ async def generate_background(
     ref_prompt_weight=None,
     model_version=None
 ):
-    url = 'https://dashscope.aliyuncs.com/api/v1/services/aigc/background-generation/generation/'
-    headers = {
-        'X-DashScope-Async': 'enable',
-        'Authorization': f'Bearer {constant.ali_bai_lian_api_key}',
-        'Content-Type': 'application/json'
-    }
     data = {
         "model": "wanx-background-generation-v2",
         "input": {
@@ -34,7 +38,6 @@ async def generate_background(
             "reference_edge": {}
         }
     }
-
     # 添加可选的 input 参数
     if ref_image_url:
         data["input"]["ref_image_url"] = ref_image_url
@@ -59,9 +62,10 @@ async def generate_background(
         parameters["model_version"] = model_version
     if parameters:
         data["parameters"] = parameters
-
+    logger.info(data)
     async with httpx.AsyncClient() as client:
-        response = await client.post(url, headers=headers, json=data)
+        response = await client.post(URL, headers=HEADERS, json=data)
+        logger.info(response.text)
         response.raise_for_status()
         return response.json()
 
@@ -98,7 +102,23 @@ async def main_test():
     print(result)
 
 if __name__ == '__main__':
-    asyncio.run(main_test())
+    data = {
+        "model": "wanx-background-generation-v2",
+        "input": {
+            "base_image_url":
+                "http://vibktprfx-prod-prod-damo-eas-cn-shanghai.oss-cn-shanghai.aliyuncs.com/seg-common-image/2025-01-12/9e503b79-6164-4f14-95b7-7438126af458/image.png?Expires=1736667780&OSSAccessKeyId=LTAI4FoLmvQ9urWXgSRpDvh1&Signature=0uRSwx2uMf%2BtynV73Oo9QzmNQFw%3D"
+            ,
+            "ref_prompt": "创建一个适合淘宝橱窗展示商品图的自然场景风格背景：要有柔和的阳光洒下，画面主体是一片长满各种鲜花（如雏菊、郁金香等）的草地，远处有葱郁的树林，天空中飘着几朵洁白的云朵，草地上可以有一些晶莹的露珠，整体色彩鲜艳、明亮且和谐，以突出商品的展示效果。"
+        },
+        "parameters": {
+            "n": 3,
+            "ref_prompt_weight": 0.5,
+            "model_version": "v3"
+        }
+    }
+    result = request('POST', url=URL, json=data, headers=HEADERS)
+    print(result.text)
+    # asyncio.run(main_test())
     # task_id = response['output']['task_id']
     # result = get_task_result('99c7a783-19f7-4816-8b4a-4434df34286c')
     # print(result)

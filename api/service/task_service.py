@@ -15,7 +15,6 @@ from api.service import llm_service
 
 
 async def task_processing(session: AsyncSession, task: Task, task_params: TaskParams):
-    task.t_uuid = uuid.uuid4().hex
     if task.task_type == 1:
         aliyun_client = AliyunClient()
         finish_urls = []
@@ -38,7 +37,7 @@ async def task_processing(session: AsyncSession, task: Task, task_params: TaskPa
         aliyun_client = AliyunClient()
         segment_is_success, finish_url = await segment_commodity(aliyun_client, task_params.background_generation_params.origin_url)
         if segment_is_success:
-            task_params.background_generation_params.origin_url = [finish_url]
+            task_params.background_generation_params.origin_url = finish_url
         else:
             task.fail_msg = f"前置步骤,商品分割失败: {finish_url}"
         logger.info(f"商品分割{segment_is_success}, finish_url: {finish_url}")

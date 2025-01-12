@@ -1,3 +1,4 @@
+import copy
 import uuid
 from typing import Any
 
@@ -27,6 +28,7 @@ async def create_task(background_tasks: BackgroundTasks,
         task = Task(**task_params_dict)
         task.task_status = 1
         task.create_id = current_user.id
+        task.t_uuid = uuid.uuid4().hex
         if task.task_type == 1:
             task.task_content = task_params.image_translate_params.model_dump()
         elif task.task_type == 2:
